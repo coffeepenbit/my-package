@@ -1,0 +1,3 @@
+* my-package
+
+For snippets that don't (yet) warrant their own package
