@@ -226,31 +226,38 @@
 (defun my-ensure-inits-present nil
   "Ensure init files present in init.el."
   (message "Checking for missing init files in init.el")
-  (dolist (modular-init-file (my-modular-init-file-names))
-    (let* ((modular-init-file-name(file-name-sans-extension modular-init-file))
-           (init-require-string-regexp (my-modular-init-require-regexp
-                                        modular-init-file-name))
+  (dolist (modular-init-filename (my-modular-init-file-names))
+    (let* ((modular-init-file-basename (file-name-sans-extension modular-init-filename))
+           (init-require-string-regexp (my-modular-init-require-regexp modular-init-file-basename))
            (nmissing-files 0))
-      (unless (or (string-match nextcloud-conflicted-copy-regexp  modular-init-file)
-                  (string-match-p init-require-string-regexp (my-init-file-content)))
+      (unless (or (modular-init-file-name-is-bad-p modular-init-filename)
+                  (init-require-string-in-init-content-p init-require-string-regexp))
         (progn
-          (display-warning 'my-package (format "%s not in init.el" modular-init-file-name))
+          (display-warning 'my-package (format "%s not in init.el" modular-init-file-basename))
           (setq nmissing-files (1+ nmissing-files)))))))
 
 
 (defun my-modular-init-file-names nil
   "Get all of my modular init files."
-  (directory-files my-setup-modular-inits-directory
-                   nil
-                   "^init-.*\.el$"))
+  (directory-files my-setup-modular-inits-directory nil "^init-.*\.el$"))
 
 
 (defun my-modular-init-require-regexp (init-file-name)
   "Create regexp from INIT-FILE-NAME."
-  (format "(\\(my-\\)?require\\(-softly\\)? '%s)" init-file-name))
+  (format ".*\\(my-\\)?require\\(-softly\\)? '%s)" init-file-name))
 
+
+(string-match-p (format "(\\(my-\\)?require\\(-softly\\)? '%s)" "init-package")
+                (my-init-file-content))
+
+(defun modular-init-file-name-is-bad-p (modular-init-filename)
+  (string-match nextcloud-conflicted-copy-regexp modular-init-filename))
 
 (defvar nextcloud-conflicted-copy-regexp (regexp-quote "conflicted copy"))
+
+
+(defun init-require-string-in-init-content-p (init-require-string-regexp)
+  (string-match-p init-require-string-regexp (my-init-file-content)))
 
 
 (defun my-init-file-content nil
