@@ -247,11 +247,9 @@
   (format ".*\\(my-\\)?require\\(-softly\\)? '%s)" init-file-name))
 
 
-(string-match-p (format "(\\(my-\\)?require\\(-softly\\)? '%s)" "init-package")
-                (my-init-file-content))
-
 (defun modular-init-file-name-is-bad-p (modular-init-filename)
   (string-match nextcloud-conflicted-copy-regexp modular-init-filename))
+
 
 (defvar nextcloud-conflicted-copy-regexp (regexp-quote "conflicted copy"))
 
