@@ -1,4 +1,4 @@
-;;; my-package.el --- my package                    -*- lexical-binding: t; -*-
+;;; my-package.el --- my package -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  coffeepenbit
 
@@ -42,6 +42,7 @@
   "Move to previous defun."
   (interactive)
   (beginning-of-defun))
+
 
 ;;;; Buffers/Windows
 (defun my-package-switch-to-minibuffer nil
@@ -352,6 +353,7 @@ ARG gets passed to `beginning-of-line'."
           (message "Pushing \"%s\"" package)
           (straight-push-package package))
       (display-warning 'my-package "No packages listed in my-package-straight-push-packages")))
+
 
   (defun my-package-straight-pull-packages nil
     (interactive)
