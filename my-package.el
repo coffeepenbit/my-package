@@ -338,12 +338,28 @@ ARG gets passed to `beginning-of-line'."
   "List of packages to push with `my-package-straight-push-packages'."
   :group 'my-package)
 
+
+(defcustom my-package-straight-pull-packages nil
+  "List of packages to push with `my-package-straight-pull-packages'."
+  :group 'my-package)
+
+
 (with-eval-after-load 'straight
   (defun my-package-straight-push-packages nil
     (interactive)
-    (dolist (package my-package-straight-push-packages)
-      (message "Pushing \"%s\"" package)
-      (straight-push-package package))))
+    (if my-package-straight-push-packages
+        (dolist (package my-package-straight-push-packages)
+          (message "Pushing \"%s\"" package)
+          (straight-push-package package))
+      (display-warning 'my-package "No packages listed in my-package-straight-push-packages")))
+
+  (defun my-package-straight-pull-packages nil
+    (interactive)
+    (if my-package-straight-pull-packages
+        (dolist (package my-package-straight-pull-packages)
+          (message "Pulling \"%s\"" package)
+          (straight-pull-package package))
+      (display-warning 'my-package "No packages listed in my-package-straight-pull-packages"))))
 
 
 ;;;; Provide
