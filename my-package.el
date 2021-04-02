@@ -25,6 +25,8 @@
 ;;; Code:
 (require 'my-setup)
 
+(defgroup my-package nil
+  "My package")
 
 ;;;; Navigation
 (defun my-package-next-defun nil
@@ -329,6 +331,19 @@ ARG gets passed to `beginning-of-line'."
   (interactive)
   (shell-command "eldev test -U coverage/coverage.json"
                  "*Eldev Test Output*"))
+
+
+;;;; Straight
+(defcustom my-package-straight-push-packages nil
+  "List of packages to push with `my-package-straight-push-packages'."
+  :group 'my-package)
+
+(with-eval-after-load 'straight
+  (defun my-package-straight-push-packages nil
+    (interactive)
+    (dolist (package my-package-straight-push-packages)
+      (message "Pushing \"%s\"" package)
+      (straight-push-package package))))
 
 
 ;;;; Provide
