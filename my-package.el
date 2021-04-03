@@ -384,7 +384,6 @@ ARG gets passed to `beginning-of-line'."
         (member major-mode my-package-set-buffer-read-only-modes))))
 
 
-
 ;;;; Provide
 (provide 'my-package)
 ;;; my-package.el ends here
