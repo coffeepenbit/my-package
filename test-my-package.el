@@ -342,6 +342,7 @@ bar
       (run-hooks 'find-file-hook)
       (should (equal nil buffer-read-only))))
 
+  ;; Verify setting find-file-hook results in read-only buffer
   (let ((find-file-hook nil))
     (should (equal nil find-file-hook))
     (add-hook 'find-file-hook 'my-package-set-buffer-read-only)
