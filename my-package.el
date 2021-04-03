@@ -364,6 +364,11 @@ ARG gets passed to `beginning-of-line'."
       (display-warning 'my-package "No packages listed in my-package-straight-pull-packages"))))
 
 
+;;;; Read only
+(defun my-package-set-buffer-read-only nil
+  "Set buffer to read only."
+  (setq buffer-read-only t))
+
 ;;;; Provide
 (provide 'my-package)
 ;;; my-package.el ends here
