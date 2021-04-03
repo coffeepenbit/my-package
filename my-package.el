@@ -369,6 +369,8 @@ ARG gets passed to `beginning-of-line'."
   "Set buffer to read only."
   (setq buffer-read-only t))
 
+
+
 ;;;; Provide
 (provide 'my-package)
 ;;; my-package.el ends here

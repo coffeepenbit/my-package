@@ -320,6 +320,19 @@ bar
                       (my-package-get-blank-lines-below))))))
 
 
+;;;; my-read-only
+(ert-deftest test-set-buffer-read-only nil
+  (with-temp-buffer
+    (should (equal nil buffer-read-only))
+    (my-package-set-buffer-read-only)
+    (should (equal t buffer-read-only)))
+
+  (with-temp-buffer
+    (setq buffer-read-only t)
+    (my-package-set-buffer-read-only)
+    (should (equal t buffer-read-only))))
+
+
 ;;;; End of tests
 (ert t)
 
