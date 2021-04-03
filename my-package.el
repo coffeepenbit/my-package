@@ -367,7 +367,21 @@ ARG gets passed to `beginning-of-line'."
 ;;;; Read only
 (defun my-package-set-buffer-read-only nil
   "Set buffer to read only."
-  (setq buffer-read-only t))
+  (when (my-package-set-buffer-read-only-p)
+    (setq buffer-read-only t)))
+
+
+(defcustom my-package-set-buffer-read-only-modes nil
+  "Modes to set to `buffer-read-only' when opening."
+  :group 'my-package
+  :type 'list)
+
+
+(defun my-package-set-buffer-read-only-p nil
+  "Return non-nil if buffer should be set as read-only by `my-package-set-buffer-read-only'."
+  (not (null ; Convert non-nil to t
+        ;; Check if major mode is intended to be a read-only mode
+        (member major-mode my-package-set-buffer-read-only-modes))))
 
 
 

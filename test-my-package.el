@@ -352,6 +352,18 @@ bar
       (should (equal t buffer-read-only)))))
 
 
+(ert-deftest test-my-package-set-buffer-read-only-p nil
+  (let ((my-package-set-buffer-read-only-modes nil))
+    (with-temp-buffer
+      (emacs-lisp-mode)
+      (should (equal nil (my-package-set-buffer-read-only-p)))))
+
+  (let ((my-package-set-buffer-read-only-modes '(emacs-lisp-mode)))
+    (with-temp-buffer
+      (emacs-lisp-mode)
+      (should (equal t (my-package-set-buffer-read-only-p))))))
+
+
 ;;;; End of tests
 (ert t)
 
