@@ -377,6 +377,7 @@ ARG gets passed to `beginning-of-line'."
   :type 'list)
 
 
+;; TODO disable disable read-only for org-capture mode
 (defun my-package-set-buffer-read-only-p nil
   "Return non-nil if buffer should be set as read-only by `my-package-set-buffer-read-only'."
   (not (null ; Convert non-nil to t
