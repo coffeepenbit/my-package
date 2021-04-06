@@ -28,6 +28,15 @@
 (defgroup my-package nil
   "My package")
 
+;;;; Projects
+(defun my-package-open-test-file nil
+  "Open corresponding test file")
+
+
+(defun my-package-corresponding-test-file (filename)
+  "Guess corresponding test filename for FILENAME."
+  (format "test-%s" filename))
+
 ;;;; Navigation
 (defun my-package-next-defun nil
   "Move to next defun."
@@ -362,27 +371,6 @@ ARG gets passed to `beginning-of-line'."
           (message "Pulling \"%s\"" package)
           (straight-pull-package package))
       (display-warning 'my-package "No packages listed in my-package-straight-pull-packages"))))
-
-
-;;;; Read only
-(defun my-package-set-buffer-read-only nil
-  "Set buffer to read only."
-  (when (my-package-set-buffer-read-only-p)
-    (setq buffer-read-only t)))
-
-
-(defcustom my-package-set-buffer-read-only-modes nil
-  "Modes to set to `buffer-read-only' when opening."
-  :group 'my-package
-  :type 'list)
-
-
-;; TODO disable disable read-only for org-capture mode
-(defun my-package-set-buffer-read-only-p nil
-  "Return non-nil if buffer should be set as read-only by `my-package-set-buffer-read-only'."
-  (not (null ; Convert non-nil to t
-        ;; Check if major mode is intended to be a read-only mode
-        (member major-mode my-package-set-buffer-read-only-modes))))
 
 
 ;;;; Provide

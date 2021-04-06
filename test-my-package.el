@@ -320,48 +320,6 @@ bar
                       (my-package-get-blank-lines-below))))))
 
 
-;;;; my-read-only
-(ert-deftest test-set-buffer-read-only/sets-to-t nil
-  (with-temp-buffer
-    (should (equal nil buffer-read-only))
-    (my-package-set-buffer-read-only)
-    (should (equal t buffer-read-only)))
-
-  (with-temp-buffer
-    (setq buffer-read-only t)
-    (my-package-set-buffer-read-only)
-    (should (equal t buffer-read-only))))
-
-
-(ert-deftest test-set-buffer-read-only/set-on-file-hook nil
-  ;; Verify default behavior is to not set to read only
-  (let ((find-file-hook nil))
-    (should (equal nil find-file-hook))
-    (with-temp-buffer
-      (should (equal nil find-file-hook))
-      (run-hooks 'find-file-hook)
-      (should (equal nil buffer-read-only))))
-
-  ;; Verify setting find-file-hook results in read-only buffer
-  (let ((find-file-hook nil))
-    (should (equal nil find-file-hook))
-    (add-hook 'find-file-hook 'my-package-set-buffer-read-only)
-    (with-temp-buffer
-      (should (equal '(my-package-set-buffer-read-only) find-file-hook))
-      (run-hooks 'find-file-hook)
-      (should (equal t buffer-read-only)))))
-
-
-(ert-deftest test-my-package-set-buffer-read-only-p nil
-  (let ((my-package-set-buffer-read-only-modes nil))
-    (with-temp-buffer
-      (emacs-lisp-mode)
-      (should (equal nil (my-package-set-buffer-read-only-p)))))
-
-  (let ((my-package-set-buffer-read-only-modes '(emacs-lisp-mode)))
-    (with-temp-buffer
-      (emacs-lisp-mode)
-      (should (equal t (my-package-set-buffer-read-only-p))))))
 
 
 ;;;; End of tests
