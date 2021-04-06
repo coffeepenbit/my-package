@@ -321,9 +321,25 @@ bar
 
 
 ;;;; corresponding test files
+
+
+(ert-deftest test-my-package-corresponding-file nil
+  :tags '(corresponding-test-files)
+  (should (equal "test-main.el" (my-package-corresponding-file
+                                 "main.el")))
+  (should (equal "main.el" (my-package-corresponding-file
+                            "test-main.el"))))
+
 (ert-deftest test-my-package-corresponding-test-file nil
   :tags '(corresponding-test-files)
-  (should (equal "test-main.el" (my-package-corresponding-test-file "main.el"))))
+  (should (equal "test-main.el" (my-package-corresponding-test-file
+                                 "main.el"))))
+
+(ert-deftest test-my-package-corresponding-source-file nil
+  :tags '(corresponding-test-files)
+  (should (equal "main.el" (my-package-corresponding-source-file
+                            "test-main.el"))))
+
 
 
 ;;;; End of tests

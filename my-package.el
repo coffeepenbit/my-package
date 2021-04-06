@@ -29,13 +29,33 @@
   "My package")
 
 ;;;; Projects
-(defun my-package-open-test-file nil
-  "Open corresponding test file")
+(defun my-package-open-corresponding-file (arg)
+  "Open corresponding test/source filename for this buffer's file.
 
+With ARG as \\[universal-argument] open file in this window."
+  (interactive "P")
+  (let ((corresponding-filename (my-package-corresponding-file
+                                 (buffer-name))))
+    (if (equal arg '(4))
+        (find-file-other-window corresponding-filename)
+      (find-file corresponding-filename))))
+
+(defun my-package-corresponding-file (filename)
+  "Guess corresponding test/source filename for source/test FILENAME."
+  (interactive)
+  (if (string-prefix-p "test-" filename)
+      (my-package-corresponding-source-file filename)
+    (my-package-corresponding-test-file filename)))
 
 (defun my-package-corresponding-test-file (filename)
   "Guess corresponding test filename for FILENAME."
+  (interactive)
   (format "test-%s" filename))
+
+(defun my-package-corresponding-source-file (filename)
+  "Guess corresponding source filename for FILENAME."
+  (interactive)
+  (replace-regexp-in-string "^test-" "" filename))
 
 ;;;; Navigation
 (defun my-package-next-defun nil
