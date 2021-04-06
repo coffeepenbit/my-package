@@ -320,6 +320,10 @@ bar
                       (my-package-get-blank-lines-below))))))
 
 
+;;;; corresponding test files
+(ert-deftest test-my-package-corresponding-test-file nil
+  :tags '(corresponding-test-files)
+  (should (equal "test-main.el" (my-package-corresponding-test-file "main.el"))))
 
 
 ;;;; End of tests
