@@ -23,8 +23,6 @@
 ;; For all my functions that don't have a home anywhere else.
 
 ;;; Code:
-(require 'my-setup)
-
 (defgroup my-package nil
   "My package")
 
@@ -34,7 +32,7 @@
 
 With ARG as \\[universal-argument] open file in this window."
   (interactive "P")
-  (let ((corresponding-filename (my-package-corresponding-file
+  (let ((corresponding-filename (my-package-corresponding-file?
                                  (buffer-name))))
     (if (equal arg '(4))
         (find-file-other-window corresponding-filename)
@@ -66,12 +64,10 @@ With ARG as \\[universal-argument] open file in this window."
   (end-of-defun)
   (beginning-of-defun))
 
-
 (defun my-package-previous-defun nil
   "Move to previous defun."
   (interactive)
   (beginning-of-defun))
-
 
 ;;;; Buffers/Windows
 (defun my-package-switch-to-minibuffer nil
@@ -80,7 +76,6 @@ With ARG as \\[universal-argument] open file in this window."
   (if (active-minibuffer-window)
       (select-window (active-minibuffer-window))
     (error "Minibuffer is not active")))
-
 
 ;;;; Blank lines
 (defun my-package-get-blank-lines-above nil
@@ -94,7 +89,6 @@ With ARG as \\[universal-argument] open file in this window."
         (forward-line -1))
       nblank-lines)))
 
-
 (defun my-package-get-blank-lines-below nil
   (save-excursion
     (let ((nblank-lines 0))
@@ -103,44 +97,25 @@ With ARG as \\[universal-argument] open file in this window."
         (setq nblank-lines (1+ nblank-lines)))
       nblank-lines)))
 
-
 (defun my-package-at-blank-line-p nil
   "Return non-nil if point at a blank line."
   (and (bolp)
        (eolp)))
-
 
 ;;;; Misc
 (defvar my-column-break
   100
   "Point where word wrapping occurs.")
 
-
 (define-minor-mode my-locked-window-mode
   "Make the current window always display this buffer."
   nil " mlw" nil
   (set-window-dedicated-p (selected-window) my-locked-window-mode))
-
 (global-set-key (kbd "C-c `") 'my-locked-window-mode)
-
-
-;; (defun my-pyvenv-autoload ()
-;;   "Load venv when opening projectile project."
-;;   (interactive)
-;;   (require 'projectile)
-;;   (let* ((project_dir (projectile-project-root))
-;;          (venv_dir (concat project_dir ".venv")))
-;;     (if (file-directory-p venv_dir)
-;;         (progn
-;;           (pyvenv-activate venv_dir)
-;;           (message "Activated venv_dir: %s" (venv_dir))))))
-
 
 (defun my-copy-line (&optional arg)
   "Copy lines (as many as prefix ARG) in the kill ring.
-
 - `\\[universal-argument]' to continue even if last command was not this function.
-
   Ease of use features:
   - Move to start of next line.
   - Appends the copy on sequential calls.
@@ -168,20 +143,16 @@ With ARG as \\[universal-argument] open file in this window."
                   ;;
                   ;; Therefore, if you want the previous line, you would enter 0
                   (line-beginning-position (+ nlines 2))))))
-
     (if (eq last-command this-command)
         (if (> nlines 0)
             (kill-append (concat "\n" (buffer-substring beg end)) nil)
           (kill-append (concat (buffer-substring beg end) "\n") 'prepend))
       (copy-region-as-kill beg end))
-
     (if (> nlines 0)
         (goto-char (+ end 1))
       (goto-char (- end 1)))))
 
-
 (defvar my-package--my-copy-lines-last-direction)
-
 
 (defun my-split-window-vertically ()
   "Split Emacs window vertically."
@@ -189,31 +160,26 @@ With ARG as \\[universal-argument] open file in this window."
   (split-window-vertically)
   (other-window 1))
 
-
 (defun my-split-window-horizontally ()
   "Split Emacs window horizontally."
   (interactive)
   (split-window-horizontally)
   (other-window 1))
 
-
 (defun my-font-exists-p (font)
   "Check if FONT exists."
   (interactive)
   (if (null (x-list-fonts font)) nil t))
 
-
 (defun my-relative-filename (filepath)
   "Convert absolute FILEPATH to relative filepath."
   (concat (file-name-as-directory "~") (file-relative-name filepath "~")))
-
 
 (defun my-fix-mixed-line-endings nil
   "Remove ^M from end of lines."
   (interactive)
   (replace-regexp "
 " "" nil nil nil nil nil))
-
 
 (defun my-dired-new-file (new-file-name)
   "Create a new file from Dired mode with NEW-FILE-NAME."
@@ -223,37 +189,11 @@ With ARG as \\[universal-argument] open file in this window."
   (sleep-for 0.1) ; Allow time for file to be created
   (revert-buffer))
 
-
-;; (defun my-current-time-microseconds ()
-;;   "Return the current time formatted to include microseconds."
-;;   (let* ((nowtime (current-time))
-;;          (now-ms (nth 2 nowtime)))
-;;     (concat (format-time-string "[%Y-%m-%dT%T" nowtime) (format ".%d]" now-ms))))
-
-
-;; (defun my-add-timestamp-message (FORMAT-STRING &rest args)
-;;   "Advice to run before `message' that prepends a timestamp to each message.
-
-;; Activate this advice with:
-;; (advice-add 'message :before 'my-add-timestamp-message)"
-;;   (unless (string-equal FORMAT-STRING "%s%s")
-;;     (let ((deactivate-mark nil)
-;;           (inhibit-read-only t))
-;;       (with-current-buffer "*Messages*"
-;;         (goto-char (point-max))
-;;         (if (not (bolp))
-;;             (newline))
-;;         (insert (my-current-time-microseconds) " ")))))
-
-;; (advice-add 'message :before 'my-add-timestamp-message)
-
-
 (defun my-package-verify-init nil
   "Verify my init.el file."
   (message "Verifying my init.el file")
   (my-ensure-inits-present)
   (my-ensure-no-extraneous-modular-inits))
-
 
 (defun my-ensure-inits-present nil
   "Ensure init files present in init.el."
@@ -268,39 +208,31 @@ With ARG as \\[universal-argument] open file in this window."
           (display-warning 'my-package (format "%s not in init.el" modular-init-file-basename))
           (setq nmissing-files (1+ nmissing-files)))))))
 
-
 (defun my-modular-init-file-names nil
   "Get all of my modular init files."
   (directory-files my-setup-modular-inits-directory nil "^init-.*\.el$"))
-
 
 (defun my-modular-init-require-regexp (init-file-name)
   "Create regexp from INIT-FILE-NAME."
   (format ".*\\(my-\\)?require\\(-softly\\)? '%s)" init-file-name))
 
-
 (defun modular-init-file-name-is-bad-p (modular-init-filename)
   (string-match nextcloud-conflicted-copy-regexp modular-init-filename))
 
-
 (defvar nextcloud-conflicted-copy-regexp (regexp-quote "conflicted copy"))
-
 
 (defun init-require-string-in-init-content-p (init-require-string-regexp)
   (string-match-p init-require-string-regexp (my-init-file-content)))
 
-
 (defun my-init-file-content nil
   "Get contents of my init.el file."
   (my-read-file (concat user-emacs-directory "init.el")))
-
 
 (defun my-read-file (file-path)
   "Read contents in FILE-PATH."
   (with-temp-buffer
     (insert-file-contents file-path)
     (buffer-string)))
-
 
 (defun my-ensure-no-extraneous-modular-inits nil
   "Ensure no extraneous inits in my init.el file."
@@ -313,7 +245,6 @@ With ARG as \\[universal-argument] open file in this window."
       (unless (cl-member match (my-modular-init-file-names) :test 'string-match)
         (display-warning 'my-package (format "%s is an extraneous init modular requirement, consider
 removing from init.el" match))))))
-
 
 (defun my-string-find-all (regex string &optional match-group-ind)
   "Return a list of all REGEX matches in STRING.
@@ -329,7 +260,6 @@ Optionally, MATCH-GROUP-IND will select a specific subgroup."
     (setq matches (reverse matches))
     matches))
 
-
 (defun my-package-move-beginning-of-line (&optional ARG)
   "Move to beginning of line or first indentation.
 
@@ -340,20 +270,17 @@ ARG gets passed to `beginning-of-line'."
       (call-interactively 'beginning-of-line ARG)
     (back-to-indentation)))
 
-
 (defun my-package-insert-lines-above (&optional nlines)
   "Insert NLINES empty lines above the current line."
   (save-excursion
     (beginning-of-line)
     (open-line (or nlines 1))))
 
-
 (defun my-package-insert-lines-below (&optional nlines)
   "Insert NLINES empty line below the current line."
   (save-excursion
     (end-of-line)
     (open-line (or nlines 1))))
-
 
 ;;;; Eldev
 (defun my-package-eldev-run-test nil
@@ -362,17 +289,14 @@ ARG gets passed to `beginning-of-line'."
   (shell-command "eldev test -U coverage/coverage.json"
                  "*Eldev Test Output*"))
 
-
 ;;;; Straight
 (defcustom my-package-straight-push-packages nil
   "List of packages to push with `my-package-straight-push-packages'."
   :group 'my-package)
 
-
 (defcustom my-package-straight-pull-packages nil
   "List of packages to push with `my-package-straight-pull-packages'."
   :group 'my-package)
-
 
 (with-eval-after-load 'straight
   (defun my-package-straight-push-packages nil
@@ -383,7 +307,6 @@ ARG gets passed to `beginning-of-line'."
           (straight-push-package package))
       (display-warning 'my-package "No packages listed in my-package-straight-push-packages")))
 
-
   (defun my-package-straight-pull-packages nil
     (interactive)
     (if my-package-straight-pull-packages
@@ -391,7 +314,6 @@ ARG gets passed to `beginning-of-line'."
           (message "Pulling \"%s\"" package)
           (straight-pull-package package))
       (display-warning 'my-package "No packages listed in my-package-straight-pull-packages"))))
-
 
 ;;;; Provide
 (provide 'my-package)
