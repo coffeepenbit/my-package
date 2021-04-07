@@ -218,12 +218,9 @@ With ARG as \\[universal-argument] open file in this window."
   (format ".*\\(my-\\)?require\\(-softly\\)? '%s)" init-file-name))
 
 (defun modular-init-file-name-is-bad-p (modular-init-filename)
-  (string-match nextcloud-conflicted-copy-regexp modular-init-filename))
-
-(defvar nextcloud-conflicted-copy-regexp (regexp-quote "conflicted copy"))
-
-(defun init-require-string-in-init-content-p (init-require-string-regexp)
-  (string-match-p init-require-string-regexp (my-init-file-content)))
+  "Non-nil when MODULAR-INIT-FILENAME is of expected form."
+  (string-match (regexp-quote "conflicted copy") ; Occurs with Nextcloud files
+                modular-init-filename))
 
 (defun my-init-file-content nil
   "Get contents of my init.el file."
