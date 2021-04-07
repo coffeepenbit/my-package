@@ -79,6 +79,7 @@ With ARG as \\[universal-argument] open file in this window."
 
 ;;;; Blank lines
 (defun my-package-get-blank-lines-above nil
+  "Get number of blank lines above current line."
   (save-excursion
     (beginning-of-line)
     (let ((nblank-lines 0))
@@ -90,6 +91,7 @@ With ARG as \\[universal-argument] open file in this window."
       nblank-lines)))
 
 (defun my-package-get-blank-lines-below nil
+  "Get number of blank lines below current line."
   (save-excursion
     (let ((nblank-lines 0))
       (while (and (eq (forward-line 1) 0)
