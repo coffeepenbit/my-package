@@ -202,10 +202,12 @@ With ARG as \\[universal-argument] open file in this window."
            (init-require-string-regexp (my-modular-init-require-regexp modular-init-file-basename))
            (nmissing-files 0))
       (unless (or (modular-init-file-name-is-bad-p modular-init-filename)
-                  (init-require-string-in-init-content-p init-require-string-regexp))
+                  (string-match-p init-require-string-regexp (my-init-file-content)))
         (progn
           (display-warning 'my-package (format "%s not in init.el" modular-init-file-basename))
           (setq nmissing-files (1+ nmissing-files)))))))
+
+(defvar my-setup-modular-inits-directory nil)
 
 (defun my-modular-init-file-names nil
   "Get all of my modular init files."
@@ -291,11 +293,13 @@ ARG gets passed to `beginning-of-line'."
 ;;;; Straight
 (defcustom my-package-straight-push-packages nil
   "List of packages to push with `my-package-straight-push-packages'."
-  :group 'my-package)
+  :group 'my-package
+  :type 'list)
 
 (defcustom my-package-straight-pull-packages nil
   "List of packages to push with `my-package-straight-pull-packages'."
-  :group 'my-package)
+  :group 'my-package
+  :type 'list)
 
 (with-eval-after-load 'straight
   (defun my-package-straight-push-packages nil
