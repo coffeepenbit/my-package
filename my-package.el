@@ -218,6 +218,7 @@
 
 (defun my-package-verify-init nil
   "Verify my init.el file."
+  (interactive)
   (message "Verifying my init.el file")
   (my-ensure-inits-present)
   (my-ensure-no-extraneous-modular-inits))
