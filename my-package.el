@@ -303,17 +303,21 @@ ARG gets passed to `beginning-of-line'."
   (defun my-package-straight-push-packages nil
     (interactive)
     (if my-package-straight-push-packages
-        (dolist (package my-package-straight-push-packages)
-          (message "Pushing \"%s\"" package)
-          (straight-push-package package))
+        (progn
+          (dolist (package my-package-straight-push-packages)
+            (message "Pushing \"%s\"" package)
+            (straight-push-package package))
+          (message "Done pushing packages."))
       (display-warning 'my-package "No packages listed in my-package-straight-push-packages")))
 
   (defun my-package-straight-pull-packages nil
     (interactive)
     (if my-package-straight-pull-packages
-        (dolist (package my-package-straight-pull-packages)
-          (message "Pulling \"%s\"" package)
-          (straight-pull-package package))
+        (progn
+          (dolist (package my-package-straight-pull-packages)
+            (message "Pulling \"%s\"" package)
+            (straight-pull-package package))
+          (message "Done pulling packages."))
       (display-warning 'my-package "No packages listed in my-package-straight-pull-packages"))))
 
 ;;;; Provide
