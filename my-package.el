@@ -68,7 +68,7 @@ With ARG as \\[universal-argument] open file in this window."
   (beginning-of-defun))
 
 ;;;; Find/search
-(eval-after-load 'ripgrep
+(with-eval-after-load 'ripgrep
   (defun my-package-ripgrep nil
     "Run ripgrep.
 
