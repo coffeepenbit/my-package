@@ -215,15 +215,16 @@ Run `projectile-ripgrep' if in project directory."
 (defun my-ensure-inits-present nil
   "Ensure init files present in init.el."
   (message "Checking for missing init files in init.el")
-  (dolist (modular-init-filename (my-modular-init-file-names))
-    (let* ((modular-init-file-basename (file-name-sans-extension modular-init-filename))
-           (init-require-string-regexp (my-modular-init-require-regexp modular-init-file-basename))
-           (nmissing-files 0))
-      (unless (or (modular-init-file-name-is-bad-p modular-init-filename)
-                  (string-match-p init-require-string-regexp (my-init-file-content)))
-        (progn
-          (display-warning 'my-package (format "%s not in init.el" modular-init-file-basename))
-          (setq nmissing-files (1+ nmissing-files)))))))
+  (let ((init-file-content (my-init-file-content)))
+    (dolist (modular-init-filename (my-modular-init-file-names))
+      (let* ((modular-init-file-basename (file-name-sans-extension modular-init-filename))
+             (init-require-string-regexp (my-modular-init-require-regexp modular-init-file-basename))
+             (nmissing-files 0))
+        (unless (or (modular-init-file-name-is-bad-p modular-init-filename)
+                    (string-match-p init-require-string-regexp init-file-content))
+          (progn
+            (display-warning 'my-package (format "%s not in init.el" modular-init-file-basename))
+            (setq nmissing-files (1+ nmissing-files))))))))
 
 (defvar my-setup-modular-inits-directory nil)
 
