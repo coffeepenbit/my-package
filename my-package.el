@@ -75,7 +75,7 @@ With ARG as \\[universal-argument] open file in this window."
 Run `projectile-ripgrep' if in project directory."
     (interactive)
     (if (and (fboundp 'projectile-project-p)
-             (project-project-p))
+             (projectile-project-p))
         (call-interactively 'projectile-ripgrep)
       (call-interactively 'ripgrep-regexp))))
 
