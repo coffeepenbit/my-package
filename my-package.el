@@ -67,6 +67,18 @@ With ARG as \\[universal-argument] open file in this window."
   (interactive)
   (beginning-of-defun))
 
+
+;;;; Find/search
+(defun my-package-ripgrep nil
+  "Run ripgrep.
+
+Run `projectile-ripgrep' if in project directory."
+  (interactive)
+  (if (and (fboundp 'projectile-project-p)
+           (project-project-p))
+      (call-interactively 'projectile-ripgrep)
+    (call-interactively 'ripgrep-regexp)))
+
 ;;;; Buffers/Windows
 (defun my-package-switch-to-minibuffer nil
   "Switch to minibuffer window."
