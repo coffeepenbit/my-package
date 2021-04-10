@@ -27,6 +27,67 @@
 (defgroup my-package nil
   "My package")
 
+;;;; Benchmark
+(define-derived-mode my-package-benchmark-mode
+  tabulated-list-mode "my-package-benchmark-mode"
+  "Major mode for tabulated list example."
+  (setq tabulated-list-format [("func id" 10 t)
+                               ("time" 10 t)
+                               ("%% time of ref" 15 nil)
+                               ("# garb. col."  15 t)
+                               ("time in gc" 0 nil)])
+  (setq tabulated-list-padding 4)
+  (setq tabulated-list-sort-key (cons "time" nil)))
+
+(defmacro my-package-benchmark-compare (nreps reference-func func1 &rest funcs)
+  "Compare benchmarks to REFERENCE-FUNC to FUNC1.
+
+NREPS is number of times to run benchmark.
+
+FUNCS are optional additional functions to compare to REFERENCE-FUNC."
+  ;; FIXME not running appropriate number of repetitions
+  `(my-package-benchmark-list-results
+    (mapcar (lambda (func)
+              (benchmark-run (or ,nreps 10) func))
+            '(,reference-func ,func1 ,@funcs))))
+
+(defun my-package-benchmark-list-results (benchmark-outputs)
+  "Display results of BENCHMARK-OUTPUTS."
+  (let ((tabulated-list-entries (list))
+        (results-buffer-name "*Benchmark Results*")
+        (results-buffer))
+    (setq results-buffer (get-buffer-create  results-buffer-name))
+    (with-current-buffer results-buffer
+      (my-package-benchmark-mode)
+      (my-package-benchmark-format-entries benchmark-outputs)
+      (tabulated-list-init-header)
+      (tabulated-list-print)
+      (setq tabulated-list-entries (list)))
+    (display-buffer results-buffer-name)))
+
+(defun my-package-benchmark-format-entries (benchmark-results)
+  "Format BENCHMARK-RESULTS for display."
+  (let ((row-ind 1)
+        (reference-time nil))
+    (mapc (lambda (output)
+            (let ((total-time (car output))
+                  (ngarbage-collections (cadr output))
+                  (total-time-garbage-collections (caddr output)))
+              (add-to-list 'tabulated-list-entries
+                           `(,(number-to-string row-ind)
+                             [,(number-to-string row-ind)
+                              ,(number-to-string total-time)
+                              ,(if (equal row-ind 1)
+                                   (progn
+                                     (setq reference-time total-time)
+                                     "1")
+                                 (format "%.2f" (* (/ total-time reference-time)
+                                                   100)))
+                              ,(number-to-string ngarbage-collections)
+                              ,(number-to-string total-time-garbage-collections)])))
+            (setq row-ind (1+ row-ind)))
+          benchmark-results)))
+
 ;;;; Projects
 (defun my-package-open-corresponding-file (arg)
   "Open corresponding test/source filename for this buffer's file.
@@ -234,6 +295,7 @@ Run `projectile-ripgrep' if in project directory."
 
 (defun my-modular-init-require-regexp (init-file-name)
   "Create regexp from INIT-FILE-NAME."
+  ;; TODO switch .* to something else for performance
   (format ".*\\(my-\\)?require\\(-softly\\)? '%s)" init-file-name))
 
 (defun modular-init-file-name-is-bad-p (modular-init-filename)

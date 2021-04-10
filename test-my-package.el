@@ -32,7 +32,6 @@
     (unload-feature 'my-package t))
 (require 'my-package "./my-package.el")
 
-
 ;;;; Copy lines
 (ert-deftest test-my-copy-line/empty nil
   :tags '(my-copy-line)
