@@ -45,10 +45,11 @@
 NREPS is number of times to run benchmark.
 
 FUNCS are optional additional functions to compare to REFERENCE-FUNC."
-  ;; FIXME not running appropriate number of repetitions
+  ;; FIXME times for same functions are not similar
+  ;; First function is longer than latter functions
   `(my-package-benchmark-list-results
     (mapcar (lambda (func)
-              (benchmark-run (or ,nreps 10) func))
+              (benchmark-run ,nreps (eval func)))
             '(,reference-func ,func1 ,@funcs))))
 
 (defun my-package-benchmark-list-results (benchmark-outputs)
