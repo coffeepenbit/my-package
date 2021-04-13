@@ -204,8 +204,7 @@ Run `projectile-ripgrep' if in project directory."
   (let* ((nlines ; Number of lines to copy if no region selected
           ;; Only relevant if prefix argument is a number and
           ;; the mark-region is NOT active
-          (if
-              (and (not mark-active)
+          (if (and (not mark-active)
                    (fixnump arg))
               arg
             1))
@@ -221,7 +220,8 @@ Run `projectile-ripgrep' if in project directory."
                   ;;
                   ;; Therefore, if you want the previous line, you would enter 0
                   (line-beginning-position (+ nlines 2))))))
-    (if (eq last-command this-command)
+    (if (and (eq last-command this-command)
+             (> (length kill-ring) 0))
         (if (> nlines 0)
             (kill-append (concat "\n" (buffer-substring beg end)) nil)
           (kill-append (concat (buffer-substring beg end) "\n") 'prepend))

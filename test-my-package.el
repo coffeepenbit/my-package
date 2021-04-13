@@ -23,181 +23,132 @@
 ;;
 
 ;;; Code:
-(require 'ert)
-(require 'my-ert)
+(require 'buttercup)
+(require 'my-package)
 
-(ert-delete-all-tests)
+(defun temp-buffer-helper (buffer-text &optional func)
+  "Useful for testing `org-mode' functions.
 
-(if (featurep 'my-package)
-    (unload-feature 'my-package t))
-(require 'my-package "./my-package.el")
+BUFFER-TEXT is the initial state of the `org-mode' buffer.
 
-;;;; Copy lines
-(ert-deftest test-my-copy-line/empty nil
-  :tags '(my-copy-line)
-  (should (equal ""
-                 (my-ert-temp-buffer
-                  ""
-                  (lambda nil
-                    (make-local-variable 'kill-ring)
-                    (call-interactively 'my-copy-line)
-                    (car kill-ring))
-                  ))))
+FUNC is what is ran after creating the buffer."
+  (with-temp-buffer
+    (insert buffer-text)
+    (goto-char (point-min))
+    (if func
+        (funcall func)
+      (buffer-string))))
 
-
-(ert-deftest test-my-copy-line/one-of-one-lines nil
-  :tags '(my-copy-line)
-  (should (equal "foobar"
-                 (my-ert-temp-buffer
-                  "foobar"
-                  (lambda nil
-                    (make-local-variable 'kill-ring)
-                    (call-interactively 'my-copy-line)
-                    (car kill-ring))
-                  ))))
-
-
-(ert-deftest test-my-copy-line/two-of-two-lines nil
-  :tags '(my-copy-line)
-  (should (equal "foo"
-                 (my-ert-temp-buffer
-                  "foo
+(describe "my-copy-line"
+  (before-each (setq inhibit-message t))
+  (it "copies empty lines"
+    (temp-buffer-helper
+     ""
+     (lambda nil
+       (make-local-variable 'kill-ring)
+       (call-interactively 'my-copy-line)
+       (expect (car kill-ring) :to-equal ""))))
+  (it "copies single lines"
+    (temp-buffer-helper
+     "foobar"
+     (lambda nil
+       (make-local-variable 'kill-ring)
+       (call-interactively 'my-copy-line)
+       (expect (car kill-ring) :to-equal "foobar"))))
+  (it "copies 2 lines"
+    (temp-buffer-helper
+     "foo
 bar"
-                  (lambda nil
-                    (make-local-variable 'kill-ring)
-                    (call-interactively 'my-copy-line)
-                    (car kill-ring))
-                  ))))
-
-
-(ert-deftest test-my-copy-line/first-of-two-lines-active-region nil
-  :tags '(my-copy-line)
-  (should (equal "foo"
-                 (my-ert-temp-buffer
-                  "foo
+     (lambda nil
+       (make-local-variable 'kill-ring)
+       (call-interactively 'my-copy-line)
+       (expect (car kill-ring) :to-equal "foo"))))
+  (it "copies lines in marked region"
+    (temp-buffer-helper
+     "foo
 bar"
-                  (lambda nil
-                    (make-local-variable 'kill-ring)
-                    (call-interactively 'set-mark-command)
-                    (end-of-line)
-                    (call-interactively 'my-copy-line)
-                    (car kill-ring))
-                  ))))
-
-
-(ert-deftest test-my-copy-line/first-of-two-lines-inactive-region nil
-  :tags '(my-copy-line)
-  (should (equal "foo"
-                 (my-ert-temp-buffer
-                  "foo
+     (lambda nil
+       (make-local-variable 'kill-ring)
+       (call-interactively 'set-mark-command)
+       (end-of-line)
+       (call-interactively 'my-copy-line)
+       (expect (car kill-ring) :to-equal "foo"))))
+  (it "copies first of 2 lines"
+    (temp-buffer-helper
+     "foo
 bar"
-                  (lambda nil
-                    (make-local-variable 'kill-ring)
-                    (call-interactively 'my-copy-line)
-                    (car kill-ring))
-                  ))))
-
-
-(ert-deftest test-my-copy-line/rest-of-line-inactive-region nil
-  :tags '(my-copy-line)
-  (should (equal "oo"
-                 (my-ert-temp-buffer
-                  "foo"
-                  (lambda nil
-                    (make-local-variable 'kill-ring)
-                    (goto-char 2)
-                    (call-interactively 'my-copy-line)
-                    (car kill-ring))
-                  ))))
-
-
-(ert-deftest test-my-copy-line/point-moves-next-line-inactive-region nil
-  :tags '(my-copy-line)
-  (should (equal '("oo" 5)
-                 (my-ert-temp-buffer
-                  "foo
+     (lambda nil
+       (make-local-variable 'kill-ring)
+       (call-interactively 'my-copy-line)
+       (expect (car kill-ring) :to-equal "foo"))))
+  (it "copies remainder of line"
+    (temp-buffer-helper
+     "foo"
+     (lambda nil
+       (make-local-variable 'kill-ring)
+       (goto-char 2)
+       (call-interactively 'my-copy-line)
+       (expect (car kill-ring) :to-equal "oo"))))
+  (it "moves point to next line if region is inactive"
+    (temp-buffer-helper
+     "foo
 " ; Point should be here (character number 5)
-                  (lambda nil
-                    (make-local-variable 'kill-ring)
-                    (goto-char 2)
-                    (call-interactively 'my-copy-line)
-                    `(,(car kill-ring) ,(point)))
-                  ))))
-
-
-(ert-deftest test-my-copy-line/point-moves-next-line-active-region nil
-  :tags '(my-copy-line)
-  (should (equal '("foo" 5)
-                 (my-ert-temp-buffer
-                  "foo
+     (lambda nil
+       (make-local-variable 'kill-ring)
+       (goto-char 2)
+       (call-interactively 'my-copy-line)
+       (expect `(,(car kill-ring) ,(point)) :to-equal '("oo" 5)))))
+  (it "moves point next line if region is active"
+    (temp-buffer-helper
+     "foo
 "
-                  (lambda nil
-                    (make-local-variable 'kill-ring)
-                    (call-interactively 'set-mark-command)
-                    (end-of-line)
-                    (call-interactively 'my-copy-line)
-                    `(,(car kill-ring) ,(point))
-                    )))))
-
-
-(ert-deftest test-my-copy-line/prefix-nlines nil
-  :tags '(my-copy-line)
-  (should (equal "foo
-bar"
-                 (my-ert-temp-buffer
-                  "foo
+     (lambda nil
+       (make-local-variable 'kill-ring)
+       (call-interactively 'set-mark-command)
+       (end-of-line)
+       (call-interactively 'my-copy-line)
+       (expect `(,(car kill-ring) ,(point)) :to-equal '("foo" 5)))))
+  (it "copies nlines when called with prefix"
+    (temp-buffer-helper
+     "foo
 bar
 eggs
 spam"
-                  (lambda nil
-                    (make-local-variable 'kill-ring)
-                    (let ((current-prefix-arg 2))
-                      (call-interactively 'my-copy-line))
-                    (car kill-ring))))
-          ))
-
-
-(ert-deftest test-my-copy-line/prefix-nlines-reverse-1 nil
-  :tags '(my-copy-line)
-  (should (equal "spa"
-                 (my-ert-temp-buffer
-                  "foo
+     (lambda nil
+       (make-local-variable 'kill-ring)
+       (let ((current-prefix-arg 2))
+         (call-interactively 'my-copy-line))
+       (expect (car kill-ring) :to-equal "foo
+bar")))
+    (temp-buffer-helper
+     "foo
 bar
 eggs
 spam"
-                  (lambda nil
-                    (make-local-variable 'kill-ring)
-                    (goto-char (- (point-max) 1)) ; start at spa|m
-                    (let ((current-prefix-arg -1))
-                      (call-interactively 'my-copy-line))
-                    (car kill-ring))))
-          ))
-
-
-(ert-deftest test-my-copy-line/prefix-nlines-reverse-2 nil
-  :tags '(my-copy-line)
-  (should (equal "eggs
-spa"
-                 (my-ert-temp-buffer
-                  "foo
+     (lambda nil
+       (make-local-variable 'kill-ring)
+       (goto-char (- (point-max) 1)) ; start at spa|m
+       (let ((current-prefix-arg -1))
+         (call-interactively 'my-copy-line))
+       (expect (car kill-ring) :to-equal "spa")))
+    (temp-buffer-helper
+     "foo
 bar
 eggs
 spam"
-                  (lambda nil
-                    (make-local-variable 'kill-ring)
-                    (goto-char (- (point-max) 1)) ; start at spa|m
-                    (let ((current-prefix-arg -2))
-                      (call-interactively 'my-copy-line))
-                    (car kill-ring))))
-          ))
-
+     (lambda nil
+       (make-local-variable 'kill-ring)
+       (goto-char (- (point-max) 1)) ; start at spa|m
+       (let ((current-prefix-arg -2))
+         (call-interactively 'my-copy-line))
+       (expect (car kill-ring) :to-equal "eggs
+spa")))))
 
 ;; BUG not sure how to simulate command for appending purposes
-;; (ert-deftest test-my-copy-line/reverse-prepend nil
-;;   :tags '(my-copy-line)
-;;   (should (equal "eggs
+;; (describe "my-copy-line/reverse-prepend"
+;;   (it "description" (expect "eggs :to-equal
 ;; spa"
-;;                  (my-ert-temp-buffer
+;;                  (temp-buffer-helper
 ;;                   "foo
 ;; bar
 ;; eggs
@@ -212,11 +163,10 @@ spam"
 
 
 ;; BUG not sure how to simulate command for appending purposes
-;; (ert-deftest test-my-copy-line/copy-append-inactive-region nil
-;;   :tags '(my-copy-line)
-;;   (should (equal "foo
+;; (describe "my-copy-line/copy-append-inactive-region"
+;;   (it "description" (expect "foo :to-equal
 ;; bar"
-;;                  (my-ert-temp-buffer
+;;                  (temp-buffer-helper
 ;;                   "foo
 ;; bar
 ;; "
@@ -228,121 +178,89 @@ spam"
 ;;                     (car kill-ring)
 ;;                     )))))
 
-
-
-
-
-;;;; Blank lines
-;;;;; Blank lines above
-(ert-deftest test-my-package-get-blank-lines-above/empty nil
-  (should (equal 0 (my-ert-temp-buffer
-                    ""
-                    'my-package-get-blank-lines-above))))
-
-
-(ert-deftest test-my-package-get-blank-lines-above/not-empty nil
-  (should (equal 0 (my-ert-temp-buffer
-                    "foobar"
-                    'my-package-get-blank-lines-above))))
-
-
-(ert-deftest test-my-package-get-blank-lines-above/one-above nil
-  (should (equal 1 (my-ert-temp-buffer
-                    "
+(describe "my-package-get-blank-lines-above"
+  (it "counts empty buffer as 0 blank lines"
+    (temp-buffer-helper
+     ""
+     (expect (my-package-get-blank-lines-above) :to-equal 0)))
+  (it "counts 1 non-empty line as 0"
+    (temp-buffer-helper
+     "foobar"
+     (expect (my-package-get-blank-lines-above) :to-equal 0)))
+  (it "counts 1 blank line above as 1"
+    (temp-buffer-helper
+     "
 foobar"
-                    (lambda nil
-                      (forward-line)
-                      (my-package-get-blank-lines-above))))))
-
-
-(ert-deftest test-my-package-get-blank-lines-above/two-lines nil
-  (should (equal 1 (my-ert-temp-buffer
-                    "
+     (lambda nil
+       (forward-line)
+       (expect (my-package-get-blank-lines-above) :to-equal 1)))
+    (temp-buffer-helper
+     "
 foo
 
 bar
 "
-                    (lambda nil
-                      (forward-line 3)
-                      (my-package-get-blank-lines-above))))))
-
-
-(ert-deftest test-my-package-get-blank-lines-above/org-mode-headlines nil
-  (should (equal 2 (my-ert-temp-buffer
-                    "
-** asdkpjasdlkjsad
+     (lambda nil
+       (forward-line 3)
+       (expect (my-package-get-blank-lines-above) :to-equal 1))))
+  (it "counts 2 blank lines above as 2"
+    (temp-buffer-helper
+     "** asdkpjasdlkjsad
 :PROPERTIES:
 :ID:       3a3b2554-15bb-40aa-9eae-ee97dbd23779
 :END:
 
 
-[[id:5967c236-64d2-45ad-8a05-f1301919466b][other]] ; Point is here
+[[id:5967c236-64d2-45ad-8a05-f1301919466b][other]]
 * alksdjasdlk
-"
-                    (lambda nil
-                      (forward-line 7)
-                      (end-of-line)
-                      (my-package-get-blank-lines-above))))))
+"  ; Point at EOL of link
+     (lambda nil
+       (org-mode)
+       (forward-line 6)
+       (end-of-line)
+       (expect (my-package-get-blank-lines-above) :to-equal 2)))))
 
 
 ;;;;; Blank lines below
-(ert-deftest test-my-package-get-blank-lines-below/empty nil
-  (should (equal 0 (my-ert-temp-buffer
-                    ""
-                    'my-package-get-blank-lines-below))))
-
-
-(ert-deftest test-my-package-get-blank-lines-below/not-empty nil
-  (should (equal 0 (my-ert-temp-buffer
-                    "foobar"
-                    'my-package-get-blank-lines-below))))
-
-
-(ert-deftest test-my-package-get-blank-lines-below/one-below nil
-  (should (equal 1 (my-ert-temp-buffer
-                    "foobar
+(describe "my-package-get-blank-lines-below"
+  (it "counts empty as 0 blank lines"
+    (temp-buffer-helper
+     ""
+     (expect (my-package-get-blank-lines-below) :to-equal 0)))
+  (it "counts 1 non-empty line as 0"
+    (temp-buffer-helper
+     "foobar"
+     (expect (my-package-get-blank-lines-below) :to-equal 0)))
+  (it "counts 1 blank line below as 1"
+    (temp-buffer-helper
+     "foobar
 "
-                    (lambda nil
-                      (my-package-get-blank-lines-below))))))
-
-
-(ert-deftest test-my-package-get-blank-lines-below/two-lines nil
-  (should (equal 2 (my-ert-temp-buffer
-                    "
+     (lambda nil
+       (expect (my-package-get-blank-lines-below) :to-equal 1))))
+  (temp-buffer-helper
+   "
 foo
 
 bar
 
 "
-                    (lambda nil
-                      (forward-line 3)
-                      (my-package-get-blank-lines-below))))))
+   (lambda nil
+     (forward-line 3)
+     (expect (my-package-get-blank-lines-below) :to-equal 2))))
 
+(describe "my-package-corresponding-file"
+  (it "returns the test filename of the given source filename"
+    (expect "test-main.el" :to-equal (my-package-corresponding-file "main.el")))
+  (it "returns the source filename of the given test filename"
+    (expect "main.el" :to-equal (my-package-corresponding-file "test-main.el"))))
 
-;;;; corresponding test files
+(describe "my-package-corresponding-test-file"
+  (it "returns the test filename of the given source filename"
+    (expect "test-main.el" :to-equal (my-package-corresponding-test-file "main.el"))))
 
-
-(ert-deftest test-my-package-corresponding-file nil
-  :tags '(corresponding-test-files)
-  (should (equal "test-main.el" (my-package-corresponding-file
-                                 "main.el")))
-  (should (equal "main.el" (my-package-corresponding-file
-                            "test-main.el"))))
-
-(ert-deftest test-my-package-corresponding-test-file nil
-  :tags '(corresponding-test-files)
-  (should (equal "test-main.el" (my-package-corresponding-test-file
-                                 "main.el"))))
-
-(ert-deftest test-my-package-corresponding-source-file nil
-  :tags '(corresponding-test-files)
-  (should (equal "main.el" (my-package-corresponding-source-file
-                            "test-main.el"))))
-
-
-
-;;;; End of tests
-(ert t)
+(describe "my-package-corresponding-source-file"
+  (it "returns the source filename of the given test filename"
+    (expect "main.el" :to-equal (my-package-corresponding-source-file "test-main.el"))))
 
 (provide 'test-my-package)
 ;;; test-my-package.el ends here
