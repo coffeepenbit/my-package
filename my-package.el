@@ -6,6 +6,7 @@
 ;; Keywords: lisp
 ;; Version: 0.0.1
 
+
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
@@ -149,6 +150,15 @@ Run `projectile-ripgrep' if in project directory."
       (select-window (active-minibuffer-window))
     (error "Minibuffer is not active")))
 
+(defun my-package-toggle-window-dedicated nil
+  "Make active window dedciated to its buffer."
+  (interactive)
+  (let (window (get-buffer-window (current-buffer)))
+    (if (window-dedicated-p)
+        (progn (set-window-dedicated-p window nil)
+               (message "current window toggled dedicated"))
+      (progn (set-window-dedicated-p window t)
+             (message "current window toggled non-dedciated")))))
 ;;;; Blank lines
 (defun my-package-get-blank-lines-above nil
   "Get number of blank lines above current line."

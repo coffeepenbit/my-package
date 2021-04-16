@@ -2,8 +2,9 @@
 
 ;; Copyright (C) 2021  kga
 
-;; Author: kga(require 'ert) <kga@Thinkpad-OpenSUSE>
+;; Author: coffeepenbit <coffeepenbit@gmail.com>
 ;; Keywords: lisp
+;; Package-requires: (buttercup)
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -220,8 +221,6 @@ bar
        (end-of-line)
        (expect (my-package-get-blank-lines-above) :to-equal 2)))))
 
-
-;;;;; Blank lines below
 (describe "my-package-get-blank-lines-below"
   (it "counts empty as 0 blank lines"
     (temp-buffer-helper
@@ -261,6 +260,18 @@ bar
 (describe "my-package-corresponding-source-file"
   (it "returns the source filename of the given test filename"
     (expect "main.el" :to-equal (my-package-corresponding-source-file "test-main.el"))))
+
+(describe "my-package-toggle-dedicated-buffer"
+  (it "makes non-dedicated buffer dedicated"
+    (expect (window-dedicated-p) :to-be nil)
+    (my-package-toggle-window-dedicated)
+    (expect (window-dedicated-p)))
+  (it "makes dedicated buffer non-dedicate"
+    (set-window-dedicated-p (get-buffer-window (current-buffer))
+                            'dedicated)
+    (expect (window-dedicated-p))
+    (my-package-toggle-window-dedicated)
+    (expect (window-dedicated-p) :to-be nil)))
 
 (provide 'test-my-package)
 ;;; test-my-package.el ends here
