@@ -50,6 +50,7 @@ FUNCS are optional additional functions to compare to REFERENCE-FUNC."
   ;; First function is longer than latter functions
   `(my-package-benchmark-list-results
     (mapcar (lambda (func)
+              (garbage-collect)
               (benchmark-run ,nreps (eval func)))
             '(,reference-func ,func1 ,@funcs))))
 
