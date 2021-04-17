@@ -34,7 +34,7 @@
   "Major mode for tabulated list example."
   (setq tabulated-list-format [("func id" 10 t)
                                ("time" 10 t)
-                               ("%% time of ref" 15 nil)
+                               ("%% of ref/100" 18 nil)
                                ("# garb. col."  15 t)
                                ("time in gc" 0 nil)])
   (setq tabulated-list-padding 4)
@@ -84,8 +84,7 @@ FUNCS are optional additional functions to compare to REFERENCE-FUNC."
                                    (progn
                                      (setq reference-time total-time)
                                      "1")
-                                 (format "%.2f" (* (/ total-time reference-time)
-                                                   100)))
+                                 (format "%.2f" (/ total-time reference-time)))
                               ,(number-to-string ngarbage-collections)
                               ,(number-to-string total-time-garbage-collections)])))
             (setq row-ind (1+ row-ind)))
