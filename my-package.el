@@ -411,6 +411,32 @@ ARG gets passed to `beginning-of-line'."
           (message "Done pulling packages."))
       (display-warning 'my-package "No packages listed in my-package-straight-pull-packages"))))
 
+
+;;;; Messages
+(defvar my-package--last-message nil
+  "Last message with timestamp appended to it.")
+
+(defun my-package-ad-timestamp-message (format-string &rest args)
+  "Prepend timestamp to each message in message buffer.
+
+FORMAT-STRING and ARGS are used by `message' to print a formatted string.
+
+Enable with (add-hook 'find-file-hook 'my-package-ad-timestamp-message)"
+  (when (and message-log-max
+             (not (string-equal format-string "%s%s")))
+    (let ((formatted-message-string (if args
+                                        (apply 'format `(,format-string ,@args))
+                                      format-string)))
+      (unless (string= formatted-message-string my-package--last-message)
+        (setq my-package--last-message formatted-message-string)
+        (let ((deactivate-mark nil)
+              (inhibit-read-only t))
+          (with-current-buffer "*Messages*"
+            (goto-char (point-max))
+            (when (not (bolp))
+              (newline))
+            (insert (format-time-string "[%F %T.%3N] "))))))))
+
 ;;;; Provide
 (provide 'my-package)
 ;;; my-package.el ends here
