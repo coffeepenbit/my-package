@@ -90,6 +90,19 @@ FUNCS are optional additional functions to compare to REFERENCE-FUNC."
             (setq row-ind (1+ row-ind)))
           benchmark-results)))
 
+;;;; Origami
+(defun my-package-origami-buttercup-parser (create)
+  "Parse `buttercup' test files for `origami' folding.
+
+To enable this parser:
+1. place in init.el:
+   (setf (alist-get 'buttercup origami-parser-alist)
+          'my-package-origami-buttercup-parser)
+2. Set file-local variable `origami-fold-style' to \"buttercup\""
+  (origami-lisp-parser
+   create
+   "(\\(def\\|x?des\\)\\w*\\s-*\\(\\s_\\|\\w\\|[:?!\"]\\)*\\([ \\t]*(.*?)\\)?"))
+
 ;;;; Projects
 (defun my-package-open-corresponding-file (arg)
   "Open corresponding test/source filename for this buffer's file.
