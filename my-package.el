@@ -6,7 +6,6 @@
 ;; Keywords: lisp
 ;; Version: 0.0.1
 
-
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
@@ -391,6 +390,19 @@ ARG gets passed to `beginning-of-line'."
   (interactive)
   (shell-command "eldev test -U coverage/coverage.json"
                  "*Eldev Test Output*"))
+
+;;;; C-code
+(with-eval-after-load 'cc-mode
+  (defun my-package-c-code-compile-buffer nil
+    "Compile current buffer."
+    (interactive)
+    (let ((compile-command (string-join (list "gcc"
+                                              (buffer-name)
+                                              "-o"
+                                              (file-name-sans-extension
+                                               (buffer-name)))
+                                        " ")))
+      (call-interactively 'compile))))
 
 ;;;; Straight
 (defcustom my-package-straight-push-packages nil
